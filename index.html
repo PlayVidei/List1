@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Video Player & Playlist - Adsterra Integrated</title>
+    
+    <!-- Iklan Popunder Adsterra -->
+    <script type="text/javascript" src="https://thewilddetail.com/58/5d/14/585d14a1088579ccf27a4840dfa44967.js"></script>
+
+    <style>
+        * { box-sizing: border-box; }
+        body {
+            background-color: #0f172a;
+            color: #f8fafc;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+        }
+        .container {
+            width: 100%;
+            max-width: 800px;
+        }
+        h2#videoTitle {
+            font-size: 18px;
+            margin-bottom: 12px;
+            color: #38bdf8;
+            word-break: break-word;
+        }
+        .player-wrapper {
+            position: relative;
+            width: 100%;
+            background: #000;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5);
+        }
+        video {
+            width: 100%;
+            height: auto;
+            display: block;
+        }
+        .action-buttons {
+            display: flex;
+            gap: 12px;
+            margin-top: 16px;
+        }
+        .btn {
+            flex: 1;
+            padding: 12px 20px;
+            font-size: 15px;
+            font-weight: 600;
+            text-align: center;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            text-decoration: none;
+            transition: background 0.2s;
+            display: inline-block;
+        }
+        .btn-download {
+            background-color: #2563eb;
+            color: #ffffff;
+        }
+        .btn-download:hover {
+            background-color: #1d4ed8;
+        }
+        .btn-fs {
+            background-color: #334155;
+            color: #ffffff;
+        }
+        .btn-fs:hover {
+            background-color: #475569;
+        }
+        
+        /* Playlist Section */
+        .playlist-section {
+            margin-top: 24px;
+            background: #1e293b;
+            padding: 16px;
+            border-radius: 12px;
+        }
+        .playlist-title {
+            font-size: 15px;
+            font-weight: bold;
+            margin-bottom: 12px;
+            color: #94a3b8;
+        }
+        .playlist-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            background: #0f172a;
+            padding: 10px;
+            border-radius: 8px;
+            margin-bottom: 8px;
+            cursor: pointer;
+            transition: background 0.2s, transform 0.1s;
+        }
+        .playlist-item:hover {
+            background: #334155;
+            transform: translateX(4px);
+        }
+        .playlist-item.active {
+            border-left: 4px solid #38bdf8;
+            background: #1e293b;
+            font-weight: bold;
+        }
+        .playlist-thumb {
+            width: 60px;
+            height: 40px;
+            object-fit: cover;
+            border-radius: 4px;
+            background: #000;
+        }
+        .playlist-item span {
+            font-size: 14px;
+            color: #f1f5f9;
+        }
+
+        /* Wadah Social Bar di Bagian Bawah */
+        .social-bar-container {
+            margin-top: 24px;
+            display: none; 
+            justify-content: center;
+            width: 100%;
+        }
+        .social-bar-container.active {
+            display: flex;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <!-- Judul Video Aktif -->
+    <h2 id="videoTitle">Memuat video...</h2>
+
+    <!-- Pemutar Video -->
+    <div class="player-wrapper" id="playerWrapper">
+        <video id="mainVideo" controls playsinline>
+            Browser Anda tidak mendukung pemutar video.
+        </video>
+    </div>
+
+    <!-- Tombol Interaktif -->
+    <div class="action-buttons">
+        <a href="#" id="downloadBtn" class="btn btn-download" download>Download Video</a>
+        <button id="fullscreenBtn" class="btn btn-fs">Tonton Fullscreen</button>
+    </div>
+
+    <!-- DAFTAR VIDEO / PLAYLIST -->
+    <div class="playlist-section">
+        <div class="playlist-title">Daftar Pilihan Video:</div>
+        <div id="playlistContainer"></div>
+    </div>
+
+    <!-- Wadah Social Bar (Muncul Setelah Video Diputar) -->
+    <div id="socialBarWrapper" class="social-bar-container">
+        <!-- Iklan Social Bar Adsterra -->
+        <script type="text/javascript" src="https://thewilddetail.com/c4/4b/2c/c44b2ccc7687c2c208901dc7f9633fa2.js"></script>
+    </div>
+</div>
+
+<script>
+    // --- KONFIGURASI ADSTERRA & PLAYLIST ---
+    const SMARTLINK_URL = "https://thewilddetail.com/jcmqzgpi?key=24b55e3636d607271fdc76c2cd116ebe";
+
+    // Daftar 6 Video dengan Thumbnail Gambar & Link Videy MP4
+    const videos = [
+        {
+            id: "vid_01",
+            title: "Video 1",
+            url: "https://cdn.videy.co/PsYT6s2u1.mp4",
+            thumb: "https://i.ibb.co/3bYbtfP/images-2.jpg"
+        },
+        {
+            id: "vid_02",
+            title: "Video 2",
+            url: "https://cdn.videy.co/uO5DceBe1.mp4",
+            thumb: "https://i.ibb.co/m5f2LYTx/images-1.jpg"
+        },
+        {
+            id: "vid_03",
+            title: "Video 3",
+            url: "https://cdn.videy.co/VhKvdshy1.mp4",
+            thumb: "https://i.ibb.co/v6hZrnCM/Screenshot-2026-1027-130055.png"
+        },
+        {
+            id: "vid_04",
+            title: "Video 4",
+            url: "https://cdn.videy.co/JFm6xDIb1.mp4",
+            thumb: "https://i.ibb.co/08wnpq1/images-3.jpg"
+        },
+        {
+            id: "vid_05",
+            title: "Video 5",
+            url: "https://cdn.videy.co/JnPWhYpO1.mp4",
+            thumb: "https://i.ibb.co/Cs9TPJy6/Screenshot-2026-1027-122048.png"
+        },
+        {
+            id: "vid_06",
+            title: "Video 6",
+            url: "https://cdn.videy.co/JBHBX7Cs1.mp4",
+            thumb: "https://i.ibb.co/HD4fxv2t/Screenshot-2026-1027-122235.png"
+        }
+    ];
+
+    const videoElement = document.getElementById('mainVideo');
+    const videoTitle = document.getElementById('videoTitle');
+    const playerWrapper = document.getElementById('playerWrapper');
+    const downloadBtn = document.getElementById('downloadBtn');
+    const fullscreenBtn = document.getElementById('fullscreenBtn');
+    const socialBarWrapper = document.getElementById('socialBarWrapper');
+    const playlistContainer = document.getElementById('playlistContainer');
+
+    let currentVideo = null;
+    let playSmartlinkTriggered = false;
+
+    // Fungsi memuat video baru ke dalam player
+    function loadVideo(videoData) {
+        currentVideo = videoData;
+        playSmartlinkTriggered = false;
+        
+        videoTitle.innerText = videoData.title;
+        videoElement.src = videoData.url;
+        downloadBtn.href = videoData.url;
+
+        const fileName = `${videoData.id}.mp4`;
+        downloadBtn.setAttribute('download', fileName);
+
+        videoElement.load();
+
+        // Highlight playlist item yang aktif
+        document.querySelectorAll('.playlist-item').forEach(item => {
+            if (item.getAttribute('data-id') === videoData.id) {
+                item.classList.add('active');
+            } else {
+                item.classList.remove('active');
+            }
+        });
+    }
+
+    // Render daftar playlist ke HTML dengan Gambar Thumbnail
+    videos.forEach((vid) => {
+        const item = document.createElement('div');
+        item.className = 'playlist-item';
+        item.setAttribute('data-id', vid.id);
+        item.innerHTML = `
+            <img src="${vid.thumb}" class="playlist-thumb" alt="${vid.title}">
+            <span>▶ ${vid.title}</span>
+        `;
+        
+        item.addEventListener('click', function() {
+            loadVideo(vid);
+        });
+
+        playlistContainer.appendChild(item);
+    });
+
+    // Muat video pertama secara otomatis saat halaman dibuka
+    if (videos.length > 0) {
+        loadVideo(videos[0]);
+    }
+
+    // --- 1. LOGIKA TOMBOL PLAY PADA PLAYER ---
+    videoElement.addEventListener('play', function() {
+        if (!currentVideo) return;
+
+        if (!playSmartlinkTriggered) {
+            window.open(SMARTLINK_URL, '_blank');
+            playSmartlinkTriggered = true;
+        }
+
+        const storageKey = `popunder_played_${currentVideo.id}`;
+        if (!localStorage.getItem(storageKey)) {
+            localStorage.setItem(storageKey, 'true');
+        }
+
+        if (!socialBarWrapper.classList.contains('active')) {
+            socialBarWrapper.classList.add('active');
+        }
+    });
+
+    // --- 2. TOMBOL DOWNLOAD ---
+    downloadBtn.addEventListener('click', function(e) {
+        window.open(SMARTLINK_URL, '_blank');
+    });
+
+    // --- 3. TOMBOL FULLSCREEN ---
+    fullscreenBtn.addEventListener('click', function(e) {
+        e.preventDefault();
+        window.open(SMARTLINK_URL, '_blank');
+
+        if (playerWrapper.requestFullscreen) {
+            playerWrapper.requestFullscreen();
+        } else if (playerWrapper.webkitRequestFullscreen) {
+            playerWrapper.webkitRequestFullscreen();
+        } else if (playerWrapper.msRequestFullscreen) {
+            playerWrapper.msRequestFullscreen();
+        } else if (videoElement.webkitEnterFullscreen) {
+            videoElement.webkitEnterFullscreen();
+        }
+    });
+</script>
+
+</body>
+</html>
