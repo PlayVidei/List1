@@ -1,261 +1,373 @@
+```html
 <!DOCTYPE html>
 <html lang="id">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gina tuobroet - Video Player & Playlist</title>
+    <title>VIDEY PLAYER - Modern Video Dashboard</title>
+    
+    <!-- IKLAN POPUNDER ADSTERRA -->
+    <script data-cfasync="false" src="https://akconstructioncareerdays.org/1/585d14a1088579ccf27a4840dfa44967"></script>
 
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Font Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Font Awesome Icons CDN -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                    colors: {
+                        darkBg: '#090d16',
+                        cardBg: '#131b2e',
+                    }
+                }
+            }
+        }
+    </script>
+    
     <style>
-        * { box-sizing: border-box; }
-        body {
-            background-color: #0f172a;
-            color: #f8fafc;
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-            margin: 0;
-            padding: 20px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            min-height: 100vh;
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
         }
-        .container {
-            width: 100%;
-            max-width: 800px;
+        ::-webkit-scrollbar-track {
+            background: #090d16;
         }
-        h2#videoTitle {
-            font-size: 18px;
-            margin-bottom: 12px;
-            color: #38bdf8;
-            word-break: break-word;
+        ::-webkit-scrollbar-thumb {
+            background: #1e293b;
+            border-radius: 4px;
         }
-        .player-wrapper {
-            position: relative;
-            width: 100%;
-            background: #000;
-            border-radius: 12px;
-            overflow: hidden;
-            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5);
-        }
-        video {
-            width: 100%;
-            height: auto;
-            display: block;
-        }
-        .action-buttons {
-            display: flex;
-            gap: 12px;
-            margin-top: 16px;
-        }
-        .btn {
-            flex: 1;
-            padding: 12px 20px;
-            font-size: 15px;
-            font-weight: 600;
-            text-align: center;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            text-decoration: none;
-            transition: background 0.2s;
-            display: inline-block;
-        }
-        .btn-download {
-            background-color: #2563eb;
-            color: #ffffff;
-        }
-        .btn-download:hover {
-            background-color: #1d4ed8;
-        }
-        .btn-fs {
-            background-color: #334155;
-            color: #ffffff;
-        }
-        .btn-fs:hover {
-            background-color: #475569;
+        ::-webkit-scrollbar-thumb:hover {
+            background: #ec4899;
         }
         
-        /* Playlist Section */
-        .playlist-section {
-            margin-top: 24px;
-            background: #1e293b;
-            padding: 16px;
-            border-radius: 12px;
+        /* Glassmorphism Effect */
+        .glass-panel {
+            background: rgba(19, 27, 46, 0.75);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
         }
-        .playlist-title {
-            font-size: 15px;
-            font-weight: bold;
-            margin-bottom: 12px;
-            color: #94a3b8;
+
+        /* Neon Glow effect */
+        .neon-glow {
+            box-shadow: 0 0 20px rgba(236, 72, 153, 0.35);
         }
-        .playlist-item {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            background: #0f172a;
-            padding: 10px;
-            border-radius: 8px;
-            margin-bottom: 8px;
-            cursor: pointer;
-            transition: background 0.2s, transform 0.1s;
+
+        /* Smooth page transition */
+        .fade-in {
+            animation: fadeIn 0.25s ease-out forwards;
         }
-        .playlist-item:hover {
-            background: #334155;
-            transform: translateX(4px);
-        }
-        .playlist-item.active {
-            border-left: 4px solid #38bdf8;
-            background: #1e293b;
-            font-weight: bold;
-        }
-        .playlist-thumb {
-            width: 60px;
-            height: 40px;
-            object-fit: cover;
-            border-radius: 4px;
-            background: #000;
-        }
-        .playlist-item span {
-            font-size: 14px;
-            color: #f1f5f9;
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(4px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
     </style>
 </head>
-<body>
+<body class="bg-darkBg text-slate-100 font-sans min-h-screen flex flex-col antialiased selection:bg-pink-500 selection:text-white">
 
-<div class="container">
-    <!-- Judul Video Aktif -->
-    <h2 id="videoTitle">Memuat video...</h2>
+    <!-- TOP HEADER NAVBAR -->
+    <header class="sticky top-0 z-50 glass-panel border-b border-slate-800/80 px-3 sm:px-6 py-2.5 flex items-center gap-3 sm:gap-6 shadow-xl">
+        <!-- Logo & Brand -->
+        <div class="flex items-center gap-2 sm:gap-3 shrink-0">
+            <div class="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-gradient-to-tr from-fuchsia-600 via-pink-500 to-cyan-400 flex items-center justify-center shadow-md neon-glow">
+                <!-- Video Camera Icon -->
+                <i class="fa-solid fa-video text-white text-xs sm:text-sm"></i>
+            </div>
+            <div>
+                <h1 class="text-base sm:text-xl font-extrabold tracking-wider bg-gradient-to-r from-pink-500 via-fuchsia-400 to-cyan-400 bg-clip-text text-transparent drop-shadow-sm">
+                    VIDEY PLAYER
+                </h1>
+            </div>
+        </div>
 
-    <!-- Pemutar Video -->
-    <div class="player-wrapper" id="playerWrapper">
-        <video id="mainVideo" controls playsinline>
-            Browser Anda tidak mendukung pemutar video.
-        </video>
-    </div>
+        <!-- Expanded Search Bar -->
+        <div class="flex-1">
+            <div class="relative w-full">
+                <span class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none text-slate-400">
+                    <i class="fa-solid fa-magnifying-glass text-xs sm:text-sm"></i>
+                </span>
+                <input type="text" id="searchInput" 
+                    placeholder="Cari video..." 
+                    class="w-full pl-9 pr-3 py-1.5 sm:py-2 bg-slate-900/90 border border-slate-700/70 rounded-xl text-xs sm:text-sm text-slate-200 placeholder-slate-400 focus:outline-none focus:border-pink-500 focus:ring-1 focus:ring-pink-500 transition duration-200">
+            </div>
+        </div>
+    </header>
 
-    <!-- Tombol Interaktif -->
-    <div class="action-buttons">
-        <a href="#" id="downloadBtn" class="btn btn-download" download>Download Video</a>
-        <button id="fullscreenBtn" class="btn btn-fs">Tonton Fullscreen</button>
-    </div>
-
-    <!-- DAFTAR VIDEO / PLAYLIST -->
-    <div class="playlist-section">
-        <div class="playlist-title">Daftar Pilihan Video (Gina tuobroet):</div>
-        <div id="playlistContainer"></div>
-    </div>
-</div>
-
-<script>
-    // Daftar 6 Video dengan Thumbnail Gambar & Link Videy MP4
-    const videos = [
-        {
-            id: "vid_01",
-            title: "Gina tuobroet - Video 1",
-            url: "https://cdn.videy.co/PsYT6s2u1.mp4",
-            thumb: "https://i.ibb.co/3bYbtfP/images-2.jpg"
-        },
-        {
-            id: "vid_02",
-            title: "Gina tuobroet - Video 2",
-            url: "https://cdn.videy.co/uO5DceBe1.mp4",
-            thumb: "https://i.ibb.co/m5f2LYTx/images-1.jpg"
-        },
-        {
-            id: "vid_03",
-            title: "Gina tuobroet - Video 3",
-            url: "https://cdn.videy.co/VhKvdshy1.mp4",
-            thumb: "https://i.ibb.co/v6hZrnCM/Screenshot-2026-1027-130055.png"
-        },
-        {
-            id: "vid_04",
-            title: "Gina tuobroet - Video 4",
-            url: "https://cdn.videy.co/JFm6xDIb1.mp4",
-            thumb: "https://i.ibb.co/08wnpq1/images-3.jpg"
-        },
-        {
-            id: "vid_05",
-            title: "Gina tuobroet - Video 5",
-            url: "https://cdn.videy.co/JnPWhYpO1.mp4",
-            thumb: "https://i.ibb.co/Cs9TPJy6/Screenshot-2026-1027-122048.png"
-        },
-        {
-            id: "vid_06",
-            title: "Gina tuobroet - Video 6",
-            url: "https://cdn.videy.co/JBHBX7Cs1.mp4",
-            thumb: "https://i.ibb.co/HD4fxv2t/Screenshot-2026-1027-122235.png"
-        }
-    ];
-
-    const videoElement = document.getElementById('mainVideo');
-    const videoTitle = document.getElementById('videoTitle');
-    const playerWrapper = document.getElementById('playerWrapper');
-    const downloadBtn = document.getElementById('downloadBtn');
-    const fullscreenBtn = document.getElementById('fullscreenBtn');
-    const playlistContainer = document.getElementById('playlistContainer');
-
-    let currentVideo = null;
-
-    // Fungsi memuat video baru ke dalam player
-    function loadVideo(videoData) {
-        currentVideo = videoData;
+    <!-- MAIN DASHBOARD CONTENT -->
+    <main class="flex-1 max-w-6xl w-full mx-auto p-2 sm:p-4 md:p-6 space-y-3 sm:space-y-5">
         
-        videoTitle.innerText = videoData.title;
-        videoElement.src = videoData.url;
-        downloadBtn.href = videoData.url;
+        <!-- MAIN PLAYER SECTION -->
+        <section class="glass-panel rounded-xl sm:rounded-2xl p-2.5 sm:p-4 shadow-xl border border-slate-800/80">
+            <div class="space-y-2">
+                <!-- Video Screen Wrapper -->
+                <div class="relative w-full aspect-video bg-black rounded-lg sm:rounded-xl overflow-hidden border border-slate-800/90 shadow-md">
+                    <!-- Embedded iframe player -->
+                    <iframe id="mainPlayerFrame" 
+                            src="" 
+                            class="w-full h-full border-0" 
+                            allowfullscreen 
+                            allow="autoplay; encrypted-media">
+                    </iframe>
 
-        const fileName = `${videoData.id}.mp4`;
-        downloadBtn.setAttribute('download', fileName);
+                    <!-- Initial Preview Poster & Custom Play Overlay -->
+                    <div id="playerOverlay" class="absolute inset-0 z-20 flex items-center justify-center bg-black/60 transition-opacity duration-300">
+                        <img id="overlayImage" src="" alt="Video Preview" class="absolute inset-0 w-full h-full object-cover">
+                        <div class="absolute inset-0 bg-black/40 backdrop-blur-[2px]"></div>
+                        
+                        <!-- Custom Play Button (Triggers Smartlink 1x) -->
+                        <button id="playTriggerBtn" onclick="handleInitialPlay()" class="relative z-30 w-14 h-14 sm:w-18 sm:h-18 rounded-full bg-gradient-to-r from-pink-500 to-fuchsia-600 text-white flex items-center justify-center shadow-2xl transform hover:scale-110 active:scale-95 transition duration-200 cursor-pointer border-2 border-white/20 neon-glow">
+                            <i class="fa-solid fa-play text-xl sm:text-2xl ml-1"></i>
+                        </button>
+                    </div>
+                </div>
 
-        videoElement.load();
+                <!-- Active Video Title -->
+                <div class="px-1 pt-0.5">
+                    <h2 id="activeTitle" class="text-xs sm:text-base font-bold text-slate-100 truncate tracking-wide">
+                        Loading...
+                    </h2>
+                </div>
+            </div>
+        </section>
 
-        // Highlight playlist item yang aktif
-        document.querySelectorAll('.playlist-item').forEach(item => {
-            if (item.getAttribute('data-id') === videoData.id) {
-                item.classList.add('active');
-            } else {
-                item.classList.remove('active');
+        <!-- COMPACT VIDEO GRID SECTION -->
+        <section class="space-y-2 sm:space-y-3">
+            <!-- Compact Section Header -->
+            <div class="flex items-center justify-between px-1">
+                <h3 class="text-xs sm:text-sm font-semibold text-slate-300 flex items-center gap-1.5">
+                    <i class="fa-solid fa-list-ul text-pink-400 text-xs"></i> Pilihan Video
+                </h3>
+                <div id="videoCounter" class="text-[10px] sm:text-xs text-slate-400 bg-slate-900/80 px-2 py-0.5 rounded-md border border-slate-800">
+                    Halaman 1
+                </div>
+            </div>
+
+            <!-- Ultra-Compact Video Cards (2x2 on Mobile for 1-screen fit) -->
+            <div id="videoGrid" class="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-4 gap-2 sm:gap-3">
+                <!-- Cards populated dynamically -->
+            </div>
+
+            <!-- COMPACT PAGINATION CONTROLS -->
+            <div class="glass-panel rounded-xl p-2 flex items-center justify-between gap-2">
+                <button id="prevBtn" onclick="changePage(currentPage - 1)" 
+                        class="px-2.5 py-1.5 rounded-lg bg-slate-800/90 hover:bg-pink-600 disabled:opacity-30 disabled:hover:bg-slate-800 text-slate-300 hover:text-white text-[11px] font-medium flex items-center gap-1 transition cursor-pointer disabled:cursor-not-allowed">
+                    <i class="fa-solid fa-chevron-left text-[9px]"></i> <span class="hidden sm:inline">Prev</span>
+                </button>
+
+                <!-- Page Number Buttons -->
+                <div id="paginationNumbers" class="flex items-center gap-1.5">
+                    <!-- Dynamic numbers -->
+                </div>
+
+                <button id="nextBtn" onclick="changePage(currentPage + 1)" 
+                        class="px-2.5 py-1.5 rounded-lg bg-slate-800/90 hover:bg-pink-600 disabled:opacity-30 disabled:hover:bg-slate-800 text-slate-300 hover:text-white text-[11px] font-medium flex items-center gap-1 transition cursor-pointer disabled:cursor-not-allowed">
+                    <span class="hidden sm:inline">Next</span> <i class="fa-solid fa-chevron-right text-[9px]"></i>
+                </button>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- JAVASCRIPT LOGIC -->
+    <script>
+        // 1. DATA VIDEO (16 Videos)
+        const videoDatabase = [
+            { id: 1, title: "Bawa spg nginap di hotel", src: "https://trbnvideo.live/e/Q8OTb3l0", poster: "https://i.ibb.co/qYbbmQ6R/Screenshot-2026-1031-075743.png" },
+            { id: 2, title: "Boking cewek cantik", src: "https://trbnvideo.live/e/q1LeKbHe", poster: "https://i.ibb.co/VWHyPXbj/Screenshot-2026-1031-075955.png" },
+            { id: 3, title: "Gadis sma cantik", src: "https://trbnvideo.live/e/CQcGvyVa", poster: "https://i.ibb.co/S7sFtzXm/Screenshot-2026-1031-080400.png" },
+            { id: 4, title: "Abg kesakitan smpe nangis", src: "https://trbnvideo.live/e/SVXyR42j", poster: "https://i.ibb.co/Gvfr6vtV/Screenshot-2026-1031-083941.png" },
+            { id: 5, title: "Ahyon jilbab", src: "https://trbnvideo.live/e/DtjKh9CG", poster: "https://i.ibb.co.com/Tqvwkkd8/Screenshot-2026-1029-002208.png" },
+            { id: 6, title: "nginep di kost pacar", src: "https://trbnvideo.live/e/S4A8HsxX", poster: "https://i.ibb.co.com/cKhW90v3/Screenshot-2026-1029-003252.png" },
+            { id: 7, title: "Goyangannya bikin gak tahan", src: "https://trbnvideo.live/e/W5K2ggG1", poster: "https://i.ibb.co.com/GmnYvhX/Screenshot-2026-1029-003737.png" },
+            { id: 8, title: "Sepupu toubrutt", src: "https://trbnvideo.live/e/k8NrIjie", poster: "https://i.ibb.co.com/LzN5Pw3L/Screenshot-2026-1028-235223.png" },
+            { id: 9, title: "Minta dibeliin iphone", src: "https://trbnvideo.live/e/E6yudbMs", poster: "https://i.ibb.co.com/S433n7H2/Screenshot-2026-1029-001612.png" },
+            { id: 10, title: "jilbab toubrutt", src: "https://trbnvideo.live/e/08SNgxe9", poster: "https://i.ibb.co.com/3VGdCJ8/Screenshot-2026-1029-001858.png" },
+            { id: 11, title: "Gina jilboob", src: "https://trbnvideo.live/e/F51NRzNP", poster: "https://i.ibb.co/NnKs0Hnd/images-4.jpg" },
+            { id: 12, title: "Gina Hijaber toge binal", src: "https://trbnvideo.live/e/H6jg5ztO", poster: "https://i.ibb.co/gZ3QjTdD/images-1.jpg" },
+            { id: 13, title: "Malu tapi menikmati", src: "https://trbnvideo.live/e/GSBw9P3Q", poster: "https://i.ibb.co/mVGSn03K/Screenshot-2026-1031-072703.png" },
+            { id: 14, title: "Jilbab mendesah dapet batang gede", src: "https://trbnvideo.live/e/NTgAYglk", poster: "https://i.ibb.co/Kp6q01J2/Screenshot-2026-1031-072954.png" },
+            { id: 15, title: "Jilbab coklat binal", src: "https://trbnvideo.live/e/a03aWEYS", poster: "https://i.ibb.co/tMPDkKmj/Screenshot-2026-1031-073143.png" },
+            { id: 16, title: "Cantik & mulus", src: "https://trbnvideo.live/e/XXvnStXb", poster: "https://i.ibb.co/LdLFpdL8/Screenshot-2026-1031-084559.png" }
+        ];
+
+        // 2. CONFIG & STATE
+        const SMARTLINK_URL = "https://auctionr.org/4/24b55e3636d607271fdc76c2cd116ebe";
+        const ITEMS_PER_PAGE = 4;
+        
+        let currentPage = 1;
+        let activeVideoId = 1;
+        let filteredVideos = [...videoDatabase];
+        let currentVideo = videoDatabase[0];
+
+        // 3. DOM ELEMENTS
+        const mainPlayerFrame = document.getElementById('mainPlayerFrame');
+        const playerOverlay = document.getElementById('playerOverlay');
+        const overlayImage = document.getElementById('overlayImage');
+        const activeTitle = document.getElementById('activeTitle');
+        const videoGrid = document.getElementById('videoGrid');
+        const paginationNumbers = document.getElementById('paginationNumbers');
+        const prevBtn = document.getElementById('prevBtn');
+        const nextBtn = document.getElementById('nextBtn');
+        const searchInput = document.getElementById('searchInput');
+        const videoCounter = document.getElementById('videoCounter');
+
+        // 4. INITIALIZATION
+        window.addEventListener('DOMContentLoaded', () => {
+            selectVideo(videoDatabase[0]);
+            renderGrid();
+        });
+
+        // 5. SMARTLINK TRIGGER LOGIC (TRIGGERS EVERY TIME PLAY BUTTON IS CLICKED)
+        function handleInitialPlay() {
+            // Trigger Smartlink on new tab EVERY TIME user clicks play overlay
+            window.open(SMARTLINK_URL, '_blank');
+
+            // Hide Overlay & Load iFrame with Autoplay
+            playerOverlay.classList.add('hidden');
+            mainPlayerFrame.src = currentVideo.src + "?autoplay=1";
+        }
+
+        // 6. SELECT VIDEO FROM LIST (RESETS PLAY OVERLAY & PREPARES SMARTLINK TRIGGER)
+        function selectVideo(video) {
+            activeVideoId = video.id;
+            currentVideo = video;
+            
+            activeTitle.textContent = video.title;
+            overlayImage.src = video.poster;
+
+            // Always show overlay when selecting a video, so user must click Play button
+            playerOverlay.classList.remove('hidden');
+            mainPlayerFrame.src = ""; // Clear current video source until play button is pressed
+
+            renderGrid();
+        }
+
+        // 7. RENDER VIDEO GRID (COMPACT 4 ITEMS PER PAGE)
+        function renderGrid() {
+            const totalPages = Math.ceil(filteredVideos.length / ITEMS_PER_PAGE) || 1;
+            
+            if (currentPage > totalPages) currentPage = totalPages;
+            if (currentPage < 1) currentPage = 1;
+
+            const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
+            const endIndex = startIndex + ITEMS_PER_PAGE;
+            const currentVideos = filteredVideos.slice(startIndex, endIndex);
+
+            videoCounter.textContent = `Halaman ${currentPage} / ${totalPages}`;
+
+            videoGrid.innerHTML = '';
+
+            if (currentVideos.length === 0) {
+                videoGrid.innerHTML = `
+                    <div class="col-span-full text-center py-6 text-slate-400">
+                        <p class="text-xs">Tidak ada video yang ditemukan.</p>
+                    </div>
+                `;
+                renderPagination(0);
+                return;
             }
-        });
-    }
 
-    // Render daftar playlist ke HTML dengan Gambar Thumbnail
-    videos.forEach((vid) => {
-        const item = document.createElement('div');
-        item.className = 'playlist-item';
-        item.setAttribute('data-id', vid.id);
-        item.innerHTML = `
-            <img src="${vid.thumb}" class="playlist-thumb" alt="${vid.title}">
-            <span>▶ ${vid.title}</span>
-        `;
-        
-        item.addEventListener('click', function() {
-            loadVideo(vid);
-        });
+            currentVideos.forEach(video => {
+                const isActive = video.id === activeVideoId;
+                const card = document.createElement('div');
+                card.className = `fade-in group cursor-pointer glass-panel rounded-lg overflow-hidden border transition-all duration-200 flex flex-col justify-between ${
+                    isActive ? 'border-pink-500 ring-1 ring-pink-500/50' : 'border-slate-800/80 hover:border-slate-700'
+                }`;
 
-        playlistContainer.appendChild(item);
-    });
+                card.onclick = () => selectVideo(video);
 
-    // Muat video pertama secara otomatis saat halaman dibuka
-    if (videos.length > 0) {
-        loadVideo(videos[0]);
-    }
+                card.innerHTML = `
+                    <div>
+                        <!-- Thumbnail Container -->
+                        <div class="relative aspect-video w-full overflow-hidden bg-slate-900">
+                            <img src="${video.poster}" 
+                                 alt="${video.title}" 
+                                 class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300">
+                            
+                            <!-- Overlay Play Button -->
+                            <div class="absolute inset-0 flex items-center justify-center bg-black/20 group-hover:bg-black/40 transition">
+                                <div class="w-7 h-7 rounded-full bg-pink-600/90 text-white flex items-center justify-center transform scale-90 group-hover:scale-100 transition duration-200">
+                                    <i class="fa-solid fa-play text-[10px] ml-0.5"></i>
+                                </div>
+                            </div>
 
-    // --- TOMBOL FULLSCREEN ---
-    fullscreenBtn.addEventListener('click', function(e) {
-        e.preventDefault();
+                            ${isActive ? `
+                                <span class="absolute top-1 left-1 px-1.5 py-0.2 bg-pink-600 text-white text-[8px] font-bold rounded flex items-center gap-1">
+                                    <span class="w-1 h-1 rounded-full bg-white animate-ping"></span> DIPUTAR
+                                </span>
+                            ` : ''}
+                        </div>
 
-        if (playerWrapper.requestFullscreen) {
-            playerWrapper.requestFullscreen();
-        } else if (playerWrapper.webkitRequestFullscreen) {
-            playerWrapper.webkitRequestFullscreen();
-        } else if (playerWrapper.msRequestFullscreen) {
-            playerWrapper.msRequestFullscreen();
-        } else if (videoElement.webkitEnterFullscreen) {
-            videoElement.webkitEnterFullscreen();
+                        <!-- Card Title -->
+                        <div class="p-1.5 sm:p-2">
+                            <h4 class="text-[11px] sm:text-xs font-medium text-slate-200 line-clamp-1 group-hover:text-pink-400 transition-colors">
+                                ${video.title}
+                            </h4>
+                        </div>
+                    </div>
+                `;
+
+                videoGrid.appendChild(card);
+            });
+
+            renderPagination(totalPages);
         }
-    });
-</script>
 
+        // 8. RENDER PAGINATION BUTTONS
+        function renderPagination(totalPages) {
+            paginationNumbers.innerHTML = '';
+
+            prevBtn.disabled = currentPage === 1 || totalPages === 0;
+            nextBtn.disabled = currentPage === totalPages || totalPages === 0;
+
+            for (let i = 1; i <= totalPages; i++) {
+                const btn = document.createElement('button');
+                btn.textContent = i;
+                btn.className = `w-7 h-7 rounded-lg text-[11px] font-medium transition flex items-center justify-center cursor-pointer ${
+                    i === currentPage 
+                    ? 'bg-pink-600 text-white font-bold shadow-md shadow-pink-600/30' 
+                    : 'bg-slate-800 text-slate-300 hover:bg-slate-700'
+                }`;
+                btn.onclick = () => changePage(i);
+                paginationNumbers.appendChild(btn);
+            }
+        }
+
+        // 9. PAGE NAVIGATION
+        function changePage(newPage) {
+            const totalPages = Math.ceil(filteredVideos.length / ITEMS_PER_PAGE);
+            if (newPage >= 1 && newPage <= totalPages) {
+                currentPage = newPage;
+                renderGrid();
+            }
+        }
+
+        // 10. REAL-TIME SEARCH FILTER
+        searchInput.addEventListener('input', (e) => {
+            const query = e.target.value.toLowerCase().trim();
+            filteredVideos = videoDatabase.filter(video => 
+                video.title.toLowerCase().includes(query)
+            );
+            currentPage = 1;
+            renderGrid();
+        });
+    </script>
 </body>
 </html>
+```
